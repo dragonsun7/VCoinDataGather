@@ -25,7 +25,7 @@ func (tm *TradeHistoryMgr) SaveData(tradeHistories []model.TradeHistory) (error)
 
 	sql1 := `
 INSERT INTO
-  tr_history (pair_id, trade_id, isbuy, price, amount, ts)
+  tr_history (pair_id, trade_id, isbuy, price, quantity, ts)
 VALUES
   ($1, $2, $3, $4, $5, to_timestamp($6))
 ON
@@ -35,7 +35,7 @@ DO
 `
 	for _, tradeHistory := range tradeHistories {
 		_, err := pg.Execute(sql1, tm.Pair.ID, tradeHistory.TradeID, tradeHistory.IsBuy,
-			tradeHistory.Price, tradeHistory.Amount, tradeHistory.TimeStamp)
+			tradeHistory.Price, tradeHistory.Quantity, tradeHistory.TimeStamp)
 		if err != nil {
 			return err
 		}

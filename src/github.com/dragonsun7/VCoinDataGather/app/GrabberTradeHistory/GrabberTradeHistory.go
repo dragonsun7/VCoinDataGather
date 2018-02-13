@@ -10,13 +10,26 @@ import (
 	"github.com/dragonsun7/VCoinDataGather/db/postgres"
 	"github.com/dragonsun7/VCoinDataGather/biz"
 	"github.com/dragonsun7/VCoinDataGather/worker"
+	"github.com/dragonsun7/VCoinDataGather/lib"
 	"fmt"
 	"sync"
+)
+
+const (
+	logfile = "GrabberTradeHistory.log"
 )
 
 func main() {
 	defer postgres.GetInstance().CloseDB()
 
+	// 初始化日志
+	err := lib.LoggerInit(logfile)
+	if err != nil {
+		panic(err)
+	}
+	defer lib.LoggerClose()
+
+	// 业务处理
 	fmt.Println("开始获取可用的交易所...")
 	exchangeMgr := biz.GetExchangeMgrInstance()
 	exchanges, err := exchangeMgr.LoadData()

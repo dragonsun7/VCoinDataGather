@@ -6,6 +6,7 @@ import (
 	"time"
 	"github.com/dragonsun7/VCoinDataGather/biz"
 	"github.com/dragonsun7/VCoinDataGather/model"
+	"github.com/dragonsun7/VCoinDataGather/lib"
 )
 
 type TradeHistoryWorker struct {
@@ -27,13 +28,13 @@ func (tw *TradeHistoryWorker) Start(wg *sync.WaitGroup) {
 		tradeHistoryMgr := biz.TradeHistoryMgr{Exchange: tw.Exchange, Pair: tw.Pair}
 		tradeHistories, err := tradeHistoryMgr.GetData()
 		if err != nil {
-			fmt.Println(err)
-			break
+			lib.Logger().Println("重新请求，count：", count)
+			continue
 		}
 
 		err = tradeHistoryMgr.SaveData(tradeHistories)
 		if err != nil {
-			fmt.Print(err)
+			lib.Logger().Println("\n保存交易历史数据失败！", err)
 			break
 		}
 
