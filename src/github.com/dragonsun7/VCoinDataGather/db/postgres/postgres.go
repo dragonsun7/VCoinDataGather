@@ -3,10 +3,9 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-
 	_ "github.com/lib/pq"
 	"sync"
-	config2 "github.com/dragonsun7/VCoinDataGather/config"
+	"github.com/dragonsun7/VCoinDataGather/config"
 )
 
 type Postgres struct {
@@ -26,13 +25,13 @@ func GetInstance() (*Postgres) {
 	once.Do(func() {
 		sharedInstance = new(Postgres)
 
-		config := config2.GetInstance()
-		driver := config.DB.Driver
-		host := config.DB.Host
-		port := config.DB.Port
-		username := config.DB.Username
-		password := config.DB.Password
-		database := config.DB.Database
+		cfg := config.GetInstance()
+		driver := cfg.DB.Driver
+		host := cfg.DB.Host
+		port := cfg.DB.Port
+		username := cfg.DB.Username
+		password := cfg.DB.Password
+		database := cfg.DB.Database
 
 		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 			host, port, username, password, database)

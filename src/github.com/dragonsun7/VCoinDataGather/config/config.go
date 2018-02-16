@@ -15,6 +15,11 @@ type Config struct {
 		Password string `json:"password"`
 		Database string `json:"database"`
 	}
+
+	Interval struct {
+		TradeHistory     int64 `json:"trade_history"`
+		UserTradeHistory int64 `json:"user_trade_history"`
+	}
 }
 
 const (
