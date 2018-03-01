@@ -1,9 +1,9 @@
 package biz
 
 import (
-	"github.com/dragonsun7/VCoinDataGather/db/postgres"
 	"strings"
 	"errors"
+	"github.com/dragonsun7/VCoinDataGather/db/postgres"
 	"github.com/dragonsun7/VCoinDataGather/model"
 )
 
@@ -48,7 +48,7 @@ SELECT
 FROM
 	bs_pair
 WHERE
-	exchange_id = $1
+	active AND exchange_id = $1
 `
 
 	pg := postgres.GetInstance()
@@ -74,7 +74,17 @@ WHERE
 
 // 保存数据到数据库
 func (pm *PairMgr) SaveData(pairs []model.Pair) (error) {
-	sql := `
+	pg := postgres.GetInstance()
+
+	sql1 := `
+UPDATE bs_pair SET active = FALSE WHERE exchange_id = $1
+`
+	_, err := pg.Execute(sql1, pm.Exchange.ID)
+	if err != nil {
+		return err
+	}
+
+	sql2 := `
 INSERT INTO
 	bs_pair (exchange_id, symbol, curr_a, curr_b)
 VALUES
@@ -82,12 +92,11 @@ VALUES
 ON
  	conflict(exchange_id, symbol)
 DO 
-	NOTHING
+	UPDATE SET active = TRUE
 `
-	pg := postgres.GetInstance()
 
 	for _, pair := range pairs {
-		_, err := pg.Execute(sql, pm.Exchange.ID, pair.Symbol, pair.CurrA, pair.CurrB)
+		_, err := pg.Execute(sql2, pm.Exchange.ID, pair.Symbol, pair.CurrA, pair.CurrB)
 		if err != nil {
 			return err
 		}
